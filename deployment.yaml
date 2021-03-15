@@ -1,0 +1,8 @@
+imports:
+- path: vm/content-server.jinja
+
+resources:
+- name: west-eu-content # Will serve UK and EU
+  type: vm/content-server.jinja
+  properties:
+    zone: europe-west2-c
