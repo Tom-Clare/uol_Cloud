@@ -1,0 +1,8 @@
+# required:
+# - zone
+
+resources:
+- name: backup-disk
+  type: compute.v1.disk
+  properties:
+    zone: {{ properties ["zone"] }}

@@ -1,8 +1,32 @@
 imports:
 - path: vm/content-server.jinja
+- path: storage/bucket.jinja
+- path: network/network-template.jinja
+- path: network/subnetwork-template.jinja
+
 
 resources:
 - name: west-eu-content # Will serve UK and EU
   type: vm/content-server.jinja
   properties:
     zone: europe-west2-c
+
+- name: content-bucket
+  type: storage/bucket.jinja
+
+- name: custom-network
+  type: network/network-template.jinja
+  properties:
+    autoCreateSubnetworks: false
+
+- name: custom-subnetwork
+  type: network/subnetwork-template.jinja
+  preoperties:
+    ipCidrRange: 10.10.10.0/24
+    network: $(ref.custom-network.selfLink)
+    region: europe-west2-c
+
+
+## add firewall and CONFIGURE IT!!! Important step lmao 
+## Re-visit the CIDR range on the subnet, pla out how many we need cos we might be good, and look if we have to set specific addresses for each instance connected to the network
+## oh, and add an SQL server <3
