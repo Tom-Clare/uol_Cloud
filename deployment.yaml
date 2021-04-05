@@ -3,6 +3,7 @@ imports:
 - path: storage/bucket.jinja
 - path: network/network-template.jinja
 - path: network/subnetwork-template.jinja
+- path: network/firewall-template.jinja
 
 
 resources:
@@ -21,12 +22,21 @@ resources:
 
 - name: custom-subnetwork
   type: network/subnetwork-template.jinja
-  preoperties:
+  properties:
     ipCidrRange: 10.10.10.0/24
     network: $(ref.custom-network.selfLink)
     region: europe-west2-c
 
+- name: custom
+  type: firewall-template.jinja
+  properties:
+    network: $(ref.custom-network.selfLink)
+    IPProtocol: TCP
+
 
 ## add firewall and CONFIGURE IT!!! Important step lmao 
+## firewall added, as well as tags. P sure it's fully configured but maybe deploy and check.
+## Write some schema files for the templates as well.
+
 ## Re-visit the CIDR range on the subnet, pla out how many we need cos we might be good, and look if we have to set specific addresses for each instance connected to the network
-## oh, and add an SQL server <3
+## oh, and add an SQL server <3 may have to configure it with the firewall as well idk
