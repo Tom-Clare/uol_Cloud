@@ -1,0 +1,16 @@
+info:
+  title: content server template schema
+  author: Thomas Clare
+  description: Restrictins for parameters given to the content server template
+  version: 1.0
+
+imports:
+- path: content-server-template.jinja
+
+required:
+- zone
+
+properties:
+  zone:
+    type: string
+    description: describes the zone th resources will be deployed in

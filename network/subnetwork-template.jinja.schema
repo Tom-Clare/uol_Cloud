@@ -1,0 +1,24 @@
+info:
+  title: subnetwork template schema
+  author: Thomas Clare
+  description: Restrictins for parameters given to the subnetwork template
+  version: 1.0
+
+imports:
+- path: subnetwork-template.jinja
+
+required:
+- ipCidrRange
+  network
+  region
+
+properties:
+  ipCidrRange:
+    type: string
+    description: the Ip Address range that identifies the subnetwork. e.g. 10.10.0.0/16
+  network:
+    type: string
+    description: the network that the subnetwork resides on
+  region: 
+    type: string
+    description: the zone in which the subnetwork resides

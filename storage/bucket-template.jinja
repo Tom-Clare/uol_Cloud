@@ -1,0 +1,6 @@
+resources:
+- name: content-bucket
+  type: storage.v1.bucket
+  properties:
+    tags:
+    items: ["http-server"] ## We want this to be accessible to http requests as well since it will be used for static content

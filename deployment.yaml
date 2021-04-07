@@ -1,6 +1,6 @@
 imports:
-- path: vm/content-server.jinja
-- path: storage/bucket.jinja
+- path: vm/content-server-template.jinja
+- path: storage/bucket-template.jinja
 - path: network/network-template.jinja
 - path: network/subnetwork-template.jinja
 - path: network/firewall-template.jinja
@@ -8,12 +8,12 @@ imports:
 
 resources:
 - name: west-eu-content # Will serve UK and EU
-  type: vm/content-server.jinja
+  type: vm/content-server-template.jinja
   properties:
     zone: europe-west2-c
 
 - name: content-bucket
-  type: storage/bucket.jinja
+  type: storage/bucket-template.jinja
 
 - name: custom-network
   type: network/network-template.jinja
@@ -27,8 +27,8 @@ resources:
     network: $(ref.custom-network.selfLink)
     region: europe-west2-c
 
-- name: custom
-  type: firewall-template.jinja
+- name: custom-firewall
+  type: network/firewall-template.jinja
   properties:
     network: $(ref.custom-network.selfLink)
     IPProtocol: TCP
@@ -36,7 +36,8 @@ resources:
 
 ## add firewall and CONFIGURE IT!!! Important step lmao 
 ## firewall added, as well as tags. P sure it's fully configured but maybe deploy and check.
-## Write some schema files for the templates as well.
 
-## Re-visit the CIDR range on the subnet, pla out how many we need cos we might be good, and look if we have to set specific addresses for each instance connected to the network
+## open port on bucket to HTTP traffic in the firewall rules as well, otherwise nothing can be served lmao.
+## Put the bucket on the same network as well?
+
 ## oh, and add an SQL server <3 may have to configure it with the firewall as well idk
