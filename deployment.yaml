@@ -1,9 +1,11 @@
 imports:
 - path: vm/content-server-template.jinja
 - path: storage/bucket-template.jinja
+- path: storage/sql-server-template.jinja
 - path: network/network-template.jinja
 - path: network/subnetwork-template.jinja
-- path: network/firewall-template.jinja
+- path: network/firewall-http-template.jinja
+- path: network/firewall-ssh-template.jinja
 
 
 resources:
@@ -14,6 +16,12 @@ resources:
 
 - name: content-bucket
   type: storage/bucket-template.jinja
+
+- name: sql-server
+  type: storage/sql-server-template.jinja  ## THE SCHEMA FILE FOR THIS BITCH IS ACTIN UP ----- FIX!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  properties:
+    region: europe-west2-c
+    tier: db-custom-16-61440     ## Ideally, this would scale
 
 - name: custom-network
   type: network/network-template.jinja
@@ -27,17 +35,25 @@ resources:
     network: $(ref.custom-network.selfLink)
     region: europe-west2-c
 
-- name: custom-firewall
-  type: network/firewall-template.jinja
+- name: http-firewall
+  type: network/firewall-http-template.jinja
+  properties:
+    network: $(ref.custom-network.selfLink)
+    IPProtocol: TCP
+
+- name: shh-firewall
+  type: network/firewall-ssh-template.jinja
   properties:
     network: $(ref.custom-network.selfLink)
     IPProtocol: TCP
 
 
-## add firewall and CONFIGURE IT!!! Important step lmao 
-## firewall added, as well as tags. P sure it's fully configured but maybe deploy and check.
+## Converge both firewall templates into single template by adding more properties
+## SQL SERVER SCHEMA FILE IS ACTING UP
 
 ## open port on bucket to HTTP traffic in the firewall rules as well, otherwise nothing can be served lmao.
 ## Put the bucket on the same network as well?
+## Link content server and disk storage as well O.O
 
 ## oh, and add an SQL server <3 may have to configure it with the firewall as well idk
+## look at scaling the SQL server tier

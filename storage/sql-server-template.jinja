@@ -1,0 +1,21 @@
+## Code has been adapted from: https://github.com/GoogleCloudPlatform/deploymentmanager-samples/blob/master/examples/v2/sqladmin/jinja/sqladmin.jinja
+
+{% set deployment_title = env['deployment'] %}
+{% set instance_title = deployment_title + '-instance' %}
+{% set database_title = deployment_title + '-db' %}
+
+resources:
+- name: {{ instance_title }}
+  type: sqladmin.v1beta4.instance
+  properties:
+    region: {{ properties["region"] }}
+    settings:
+      tier: {{ properties["tier"] }}
+    tags: ["ssh-accessible"]
+
+- name: {{ database_title }}
+  type: sqladmin.v1beta4.database
+  properties:
+    name: {{ database_title }}
+    instance: $(ref.{{ instance_title }}.name) ## will assign databse to instance defined above
+    charset: utf8

@@ -1,11 +1,11 @@
 info:
   title: firewall template schema
   author: Thomas Clare
-  description: Restrictins for parameters given to the firewall template
+  description: Restrictins for parameters given to the SSH firewall template
   version: 1.0
 
 imports:
-- path: firewall-template.jinja
+- path: firewall-ssh-template.jinja
 
 required:
 - network

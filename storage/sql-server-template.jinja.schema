@@ -1,0 +1,21 @@
+info:
+  title: SQL server template schema
+  author: Thomas Clare
+  description: Restrictins for parameters given to the sql server template
+  version: 1.0
+
+imports:
+- path: sql-server-template.jinja
+
+required:
+- region
+  tier
+
+properties:
+  region: 
+    type: string
+    description: the zone in which the subnetwork resides
+  tier:
+    type: string
+    description: how powerful the resources behind the databse should be
+  
