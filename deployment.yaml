@@ -50,12 +50,12 @@ resources:
     network: $(ref.custom-network.selfLink)
     IPProtocol: TCP
 
-- name: static-address
+- name: static-vpn
   type: network/VPN/address-template.jinja
   properties:
-    region: europe-west2-c
+    region: europe-west2
 
-- name: gateway
+- name: vpn
   type: network/VPN/gateway-template.jinja
   properties:
     region: europe-west2-c
@@ -68,9 +68,9 @@ resources:
     name: forwarding-rule-esp
     region: europe-west2-c
     IPProtocol: ESP
-    IPAddress: $(ref.static-address.address)
+    IPAddress: $(ref.static-vpn-address.address)
     network: $(ref.custom-network.selfLink)
-    target: $(ref.gateway.selfLink)
+    target: $(ref.vpn-gateway.selfLink)
 
 ## UDP 500 forwarding rule
 - name: forwarding-rule-udp500
@@ -79,9 +79,9 @@ resources:
     name: forwarding-rule-udp500
     region: europe-west2-c
     IPProtocol: UDP
-    IPAddress: $(ref.static-address.address)
+    IPAddress: $(ref.static-vpn-address.address)
     network: $(ref.custom-network.selfLink)
-    target: $(ref.gateway.selfLink)
+    target: $(ref.vpn-gateway.selfLink)
 
 ## UDP 4500 forwarding rule
 - name: forwarding-rule-udp4500
@@ -90,9 +90,9 @@ resources:
     name: forwarding-rule-udp4500
     region: europe-west2-c
     IPProtocol: UDP
-    IPAddress: $(ref.static-address.address)
+    IPAddress: $(ref.static-vpn-address.address)
     network: $(ref.custom-network.selfLink)
-    target: $(ref.gateway.selfLink)
+    target: $(ref.vpn-gateway.selfLink)
 
 
 ## Converge both firewall templates into single template by adding more properties
