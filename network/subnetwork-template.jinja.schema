@@ -9,8 +9,8 @@ imports:
 
 required:
 - ipCidrRange
-  network
-  region
+- network
+- region
 
 properties:
   ipCidrRange:

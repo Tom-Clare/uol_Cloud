@@ -1,0 +1,36 @@
+info:
+  title: forwarding rules template schema
+  author: Thomas Clare
+  description: Restrictins for parameters given to the forwading rules template
+  version: 1.0
+
+imports:
+- path: forwarding-rule-template.jinja
+
+required:
+- name
+- region
+- IPProtocol
+- IPAddress
+- network
+- target
+
+properties:
+  name:
+    type: string
+    description: name of the rule
+  region: 
+    type: string
+    description: the zone in which the subnetwork resides
+  IPProtocol:
+    type: string
+    description: the protocol the rule applies to
+  IPAddress:
+    type: string
+    description: the external-facing static IP address of the gateway (using selfLink)
+  network:
+    type: string
+    description: the network that the rule resides on (using selfLink)
+  target:
+    type: string
+    description: identifier for the gateway (using selfLink)

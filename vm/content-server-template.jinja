@@ -1,5 +1,5 @@
 resources:
-- name: standard
+- name: {{ env["name"] }}-server
   type: compute.v1.instance
   properties:
     zone: {{ properties["zone"] }} #custom zone

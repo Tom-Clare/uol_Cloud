@@ -1,0 +1,9 @@
+resources:
+- name: {{ properties["name"] }}
+  type: compute.v1.forwardingRules
+  properties:
+    region: {{ properties["region"] }}
+    IPProtocol: {{ properties["IPProtocol"] }}
+    IPAddress: {{ properties["IPAddress"] }}
+    network: {{ properties["network"] }}
+    target: {{ properties["target"] }}

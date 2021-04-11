@@ -1,0 +1,6 @@
+resources:
+- name: {{ env["deployment"] }}-gateway
+  type: compute.v1.targetVpnGateway
+  properties:
+    region: {{ properties["region"] }}
+    network: {{ properties["network"] }}

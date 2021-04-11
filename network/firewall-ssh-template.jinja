@@ -1,5 +1,5 @@
 resources:
-- name: {{ env["name"] }}-allow-ssh
+- name: {{ env["deployment"] }}-allow-ssh
   type: compute.v1.firewall
   properties:
     targetTags: ["ssh-accessible"]

@@ -1,0 +1,5 @@
+resources:
+- name: {{ env["deployment"] }}-address
+  type: compute.v1.address
+  properties:
+    region: {{ properties["region"] }}

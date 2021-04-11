@@ -9,7 +9,7 @@ imports:
 
 required:
 - network
-  IPProtocol
+- IPProtocol
 
 properties:
   network:
