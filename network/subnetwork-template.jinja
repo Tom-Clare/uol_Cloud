@@ -1,5 +1,5 @@
 resources:
-- name: {{ env["deployment"] }}
+- name: {{ env["name"] }}-subnet
   type: compute.v1.subnetwork
   properties:
     ipCidrRange: {{ properties["ipCidrRange"] }}

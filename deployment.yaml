@@ -4,11 +4,12 @@ imports:
 - path: storage/sql-server-template.jinja
 - path: network/network-template.jinja
 - path: network/subnetwork-template.jinja
-- path: network/firewall-http-template.jinja
-- path: network/firewall-ssh-template.jinja
+- path: network/firewalls/firewall-http-template.jinja
+- path: network/firewalls/firewall-ssh-template.jinja
 - path: network/VPN/address-template.jinja
 - path: network/VPN/gateway-template.jinja
 - path: network/VPN/forwarding-rule-template.jinja
+- path: network/VPN/vpn-tunnel-template.jinja
 
 
 resources:
@@ -24,14 +25,14 @@ resources:
   type: storage/sql-server-template.jinja  ## THE SCHEMA FILE FOR THIS BITCH IS ACTIN UP ----- FIX!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   properties:
     region: europe-west2-c
-    tier: db-custom-16-61440     ## Ideally, this would scale
+    tier: db-custom-16-61440  ## Ideally, this would scale
 
-- name: custom-network
+- name: custom
   type: network/network-template.jinja
   properties:
     autoCreateSubnetworks: false
 
-- name: custom-subnetwork
+- name: custom
   type: network/subnetwork-template.jinja
   properties:
     ipCidrRange: 10.10.10.0/24
@@ -39,13 +40,13 @@ resources:
     region: europe-west2-c
 
 - name: http-firewall
-  type: network/firewall-http-template.jinja
+  type: network/firewalls/firewall-http-template.jinja
   properties:
     network: $(ref.custom-network.selfLink)
     IPProtocol: TCP
 
 - name: shh-firewall
-  type: network/firewall-ssh-template.jinja
+  type: network/firewalls/firewall-ssh-template.jinja
   properties:
     network: $(ref.custom-network.selfLink)
     IPProtocol: TCP
@@ -94,13 +95,22 @@ resources:
     network: $(ref.custom-network.selfLink)
     target: $(ref.vpn-gateway.selfLink)
 
+## VPN Tunnel
+- name: custom
+  type: network/VPN/vpn-tunnel-template.jinja
+  properties:
+    region: europe-west2
+    forwardingRule: $(ref.forwarding-rule-udp4500.selfLink)
+    ikeVersion: 2 ## Either 1 or 2
+    peerIp: $(ref.vpn-gateway.vpnInterfaces[].ipAddress)
+    sharedSecret: EVQQq5kYK1tfuB/nvOOn+XX3amOrNqx8 ## generated from https://cloud.google.com/network-connectivity/docs/vpn/how-to/generating-pre-shared-key
+    targetVpnGateway: $(ref.vpn-gateway.selfLink)
+
+    
 
 ## Converge both firewall templates into single template by adding more properties
-## SQL SERVER SCHEMA FILE IS ACTING UP
+## SQL SERVER SCHEMA FILE IS ACTING UP -  Is it tho?
 
-## open port on bucket to HTTP traffic in the firewall rules as well, otherwise nothing can be served lmao.
-## Put the bucket on the same network as well?
 ## Link content server and disk storage as well O.O
 
 ## oh, and add an SQL server <3 may have to configure it with the firewall as well idk
-## look at scaling the SQL server tier

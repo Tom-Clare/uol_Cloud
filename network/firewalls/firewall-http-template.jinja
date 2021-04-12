@@ -1,5 +1,5 @@
 resources:
-- name: {{ env["deployment"] }}-allow-http
+- name: {{ env["name"] }}-firewall
   type: compute.v1.firewall
   properties:
     targetTags: ["http-server"]

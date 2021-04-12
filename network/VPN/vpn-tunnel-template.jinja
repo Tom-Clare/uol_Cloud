@@ -1,0 +1,10 @@
+resources:
+- name: {{ env["name"] }}-vpn-tunnel
+  type: compute.v1.vpnTunnel
+  properties:
+    region: {{ properties["region"] }}
+    forwardingRule: {{ properties["forwardingRule"] }}
+    ikeVersion: {{ properties["ikeVersion"] }}
+    peerIp: {{ properties["peerIp"] }}
+    sharedSecret: {{ properties["sharedSecret"] }}
+    targetVpnGateway: {{ properties["targetVpnGateway"] }}
