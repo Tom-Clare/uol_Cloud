@@ -4,109 +4,137 @@ imports:
 - path: storage/sql-server-template.jinja
 - path: network/network-template.jinja
 - path: network/subnetwork-template.jinja
+- path: network/firewalls/firewall-vpn-template.jinja
 - path: network/firewalls/firewall-http-template.jinja
 - path: network/firewalls/firewall-ssh-template.jinja
 - path: network/VPN/address-template.jinja
 - path: network/VPN/gateway-template.jinja
 - path: network/VPN/forwarding-rule-template.jinja
 - path: network/VPN/vpn-tunnel-template.jinja
+- path: network/VPN/route-template.jinja
 
 
 resources:
-- name: west-eu-content # Will serve UK and EU
+
+## COMPUTE RESOURCES FOR CONTENT
+- name: west-eu-content ##west-eu-content-server    Will act as content server for UK and larger west EU area
   type: vm/content-server-template.jinja
   properties:
     zone: europe-west2-c
 
-- name: content-bucket
+- name: content ##content-bucket    Will host photos and static content - acting as a kind of CDN
   type: storage/bucket-template.jinja
 
-- name: sql-server
-  type: storage/sql-server-template.jinja  ## THE SCHEMA FILE FOR THIS BITCH IS ACTIN UP ----- FIX!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+- name: sql-server ##sql-server-instance and sql-server-db
+  type: storage/sql-server-template.jinja
   properties:
-    region: europe-west2-c
-    tier: db-custom-16-61440  ## Ideally, this would scale
+    region: europe-west2
+    tier: db-custom-16-61440  ## server specifications
 
-- name: custom
+## NETWORKS AND SUBNETWORKS
+- name: primary ##primary-network    Main network for cloud resources
   type: network/network-template.jinja
   properties:
-    autoCreateSubnetworks: false
+    autoCreateSubnetworks: false ## We'd like our own subnets here
 
-- name: custom
+- name: custom ##custom-subnet
   type: network/subnetwork-template.jinja
   properties:
-    ipCidrRange: 10.10.10.0/24
-    network: $(ref.custom-network.selfLink)
-    region: europe-west2-c
+    ipCidrRange: 10.10.10.0/24 ## Class C network for cloud resources
+    network: $(ref.primary-network.selfLink) ## Link to the primary network for this deployment
+    region: europe-west2
 
-- name: http-firewall
+## FIREWALLS
+## Resources will need http-server tag to allow HTTP traffic
+- name: http-firewall ##http-firewall-firewall    Allow http requests onto the network
   type: network/firewalls/firewall-http-template.jinja
   properties:
-    network: $(ref.custom-network.selfLink)
+    network: $(ref.primary-network.selfLink)
     IPProtocol: TCP
 
-- name: shh-firewall
+## Resources will need ssh-accessible tag to allow SSH traffic
+- name: shh-firewall ##shh-firewall-allow-ssh
   type: network/firewalls/firewall-ssh-template.jinja
   properties:
-    network: $(ref.custom-network.selfLink)
+    network: $(ref.primary-network.selfLink)
     IPProtocol: TCP
 
-- name: static-vpn
+## VPN SETUP
+## Paths can be found in network/ area. To retrieve URL to access vpn, use $(ref.vpn-gateway.tunnels)
+## Code has been adapted from: https://github.com/GoogleCloudPlatform/deploymentmanager-samples/blob/master/examples/v2/vpn_auto_subnet/vpn-auto-subnet.jinja
+- name: static-vpn ##static-vpn-address    Creates static IP address for use with VPN
   type: network/VPN/address-template.jinja
   properties:
     region: europe-west2
 
-- name: vpn
+- name: vpn ##vpn-gateway
   type: network/VPN/gateway-template.jinja
   properties:
-    region: europe-west2-c
-    network: $(ref.custom-network.selfLink)
+    region: europe-west2
+    network: $(ref.primary-network.selfLink) ## Link to the primary network for this deployment
 
 ## ESP forwarding rule
-- name: forwarding-rule-esp
+- name: forwarding-rule-esp ##forwarding-rule-esp
   type: network/VPN/forwarding-rule-template.jinja
   properties:
-    name: forwarding-rule-esp
-    region: europe-west2-c
+    name: forwarding-rule-esp  ## Forward ESP traffic to allow secure VPN setup
+    region: europe-west2
     IPProtocol: ESP
-    IPAddress: $(ref.static-vpn-address.address)
-    network: $(ref.custom-network.selfLink)
-    target: $(ref.vpn-gateway.selfLink)
+    IPAddress: $(ref.static-vpn-address.address) ## Publically accessible endpoint for forward traffic from
+    network: $(ref.primary-network.selfLink) ## Apply on the primary network for this deployment
+    target: $(ref.vpn-gateway.selfLink) ## Forward the traffic to this target
 
 ## UDP 500 forwarding rule
-- name: forwarding-rule-udp500
+- name: forwarding-rule-udp500 ##forwarding-rule-udp500
   type: network/VPN/forwarding-rule-template.jinja
   properties:
-    name: forwarding-rule-udp500
-    region: europe-west2-c
+    name: forwarding-rule-udp500 ## Forward UDP::500 to allow secure VPN setup
+    region: europe-west2
     IPProtocol: UDP
-    IPAddress: $(ref.static-vpn-address.address)
-    network: $(ref.custom-network.selfLink)
-    target: $(ref.vpn-gateway.selfLink)
+    IPAddress: $(ref.static-vpn-address.address) ## Publically accessible endpoint for forward traffic from
+    network: $(ref.primary-network.selfLink) ## Apply on the primary network for this deployment
+    target: $(ref.vpn-gateway.selfLink) ## Forward the traffic to this target
 
 ## UDP 4500 forwarding rule
-- name: forwarding-rule-udp4500
+- name: forwarding-rule-udp4500 ##forwarding-rule-udp4500
   type: network/VPN/forwarding-rule-template.jinja
   properties:
-    name: forwarding-rule-udp4500
-    region: europe-west2-c
+    name: forwarding-rule-udp4500 ## Forward UDP::4500 to allow secure VPN setup
+    region: europe-west2
     IPProtocol: UDP
-    IPAddress: $(ref.static-vpn-address.address)
-    network: $(ref.custom-network.selfLink)
-    target: $(ref.vpn-gateway.selfLink)
+    IPAddress: $(ref.static-vpn-address.address) ## Publically accessible endpoint for forward traffic from
+    network: $(ref.primary-network.selfLink) ## Apply on the primary network for this deployment
+    target: $(ref.vpn-gateway.selfLink) ## Forward the traffic to this target
 
 ## VPN Tunnel
-- name: custom
+- name: udp4500 ##udp4500-vpn-tunnel
   type: network/VPN/vpn-tunnel-template.jinja
   properties:
     region: europe-west2
-    forwardingRule: $(ref.forwarding-rule-udp4500.selfLink)
+    forwardingRule: $(ref.forwarding-rule-udp4500.selfLink) ## Set active URL
     ikeVersion: 2 ## Either 1 or 2
-    peerIp: $(ref.vpn-gateway.vpnInterfaces[].ipAddress)
+    peerIp: $(ref.vpn-gateway.tunnels) ## Pass URL of available tunnel
     sharedSecret: EVQQq5kYK1tfuB/nvOOn+XX3amOrNqx8 ## generated from https://cloud.google.com/network-connectivity/docs/vpn/how-to/generating-pre-shared-key
     targetVpnGateway: $(ref.vpn-gateway.selfLink)
 
+## VPN firewall - allow inbound from peer network
+- name: inbound ##inbound-vpn-rule-firewall
+  type: network/firewalls/firewall-vpn-template.jinja
+  properties:
+    network: $(ref.primary-network.selfLink)
+    sourceRanges: "0.0.0.0/0"
+  
+## Route - outbound should go to peer network
+- name: vpn-outbound  ##vpn-outbound-route
+  type: network/VPN/route-template.jinja
+  properties:
+    network: $(ref.primary-network.selfLink)
+    nextHopVpnTunnel: $(ref.udp4500-vpn-tunnel.selfLink)
+    priority: 100
+    destRange: "0.0.0.0/0"
+    routeTag: vpnRoute
     
+## Complete VPN!
 
 ## Converge both firewall templates into single template by adding more properties
 ## SQL SERVER SCHEMA FILE IS ACTING UP -  Is it tho?

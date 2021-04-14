@@ -1,0 +1,10 @@
+resources:
+- name: {{ env["name"] }}-route
+  type: compute.v1.route
+  properties:
+    network: {{ properties["network"] }}
+    nextHopVpnTunnel: {{ properties["nextHopVpnTunnel"] }}
+    priority: {{ properties["priority"] }}
+    destRange: {{ properties["destRange"] }}
+    tags:
+      - {{ properties["routeTag"] }}
