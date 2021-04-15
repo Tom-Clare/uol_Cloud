@@ -9,8 +9,12 @@ imports:
 
 required:
 - zone
+- disk
 
 properties:
   zone:
     type: string
     description: describes the zone th resources will be deployed in
+  disk:
+    type: string
+    description: disk used to store website content for delivery (reference using selfLink)

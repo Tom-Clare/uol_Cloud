@@ -1,12 +1,14 @@
 imports:
 - path: vm/content-server-template.jinja
+- path: storage/disk-template.jinja
 - path: storage/bucket-template.jinja
 - path: storage/sql-server-template.jinja
 - path: network/network-template.jinja
 - path: network/subnetwork-template.jinja
-- path: network/firewalls/firewall-vpn-template.jinja
-- path: network/firewalls/firewall-http-template.jinja
-- path: network/firewalls/firewall-ssh-template.jinja
+##- path: network/firewalls/firewall-vpn-template.jinja
+##- path: network/firewalls/firewall-http-template.jinja
+##- path: network/firewalls/firewall-ssh-template.jinja
+- path: network/firewall-template.jinja
 - path: network/VPN/address-template.jinja
 - path: network/VPN/gateway-template.jinja
 - path: network/VPN/forwarding-rule-template.jinja
@@ -17,10 +19,16 @@ imports:
 resources:
 
 ## COMPUTE RESOURCES FOR CONTENT
+- name: content-storage ##content-storage-disk
+  type: storage/disk-template.jinja
+  properties: 
+    zone: europe-west2-c
+
 - name: west-eu-content ##west-eu-content-server    Will act as content server for UK and larger west EU area
   type: vm/content-server-template.jinja
   properties:
     zone: europe-west2-c
+    disk: $(ref.content-storage-disk.selfLink)
 
 - name: content ##content-bucket    Will host photos and static content - acting as a kind of CDN
   type: storage/bucket-template.jinja
@@ -46,18 +54,22 @@ resources:
 
 ## FIREWALLS
 ## Resources will need http-server tag to allow HTTP traffic
-- name: http-firewall ##http-firewall-firewall    Allow http requests onto the network
-  type: network/firewalls/firewall-http-template.jinja
+- name: http ##http-firewall    Allow http requests onto the network
+  type: network/firewall-template.jinja
   properties:
     network: $(ref.primary-network.selfLink)
-    IPProtocol: TCP
+    targetTags: ["http-server"]
+    IPProtocol: ["TCP"]
+    ports: ["80"]
 
 ## Resources will need ssh-accessible tag to allow SSH traffic
-- name: shh-firewall ##shh-firewall-allow-ssh
-  type: network/firewalls/firewall-ssh-template.jinja
+- name: ssh ##ssh-firewall
+  type: network/firewall-template.jinja
   properties:
     network: $(ref.primary-network.selfLink)
-    IPProtocol: TCP
+    targetTags: ["ssh-accessible"]
+    IPProtocol: ["TCP"]
+    ports: ["22"]
 
 ## VPN SETUP
 ## Paths can be found in network/ area. To retrieve URL to access vpn, use $(ref.vpn-gateway.tunnels)
@@ -119,10 +131,11 @@ resources:
 
 ## VPN firewall - allow inbound from peer network
 - name: inbound ##inbound-vpn-rule-firewall
-  type: network/firewalls/firewall-vpn-template.jinja
+  type: network/firewall-template.jinja
   properties:
     network: $(ref.primary-network.selfLink)
-    sourceRanges: "0.0.0.0/0"
+    sourceRanges: $(ref.vpn-gateway.tunnels)
+    IPProtocol: ["TCP", "UDP", "ICMP"]
   
 ## Route - outbound should go to peer network
 - name: vpn-outbound  ##vpn-outbound-route
@@ -133,12 +146,5 @@ resources:
     priority: 100
     destRange: "0.0.0.0/0"
     routeTag: vpnRoute
-    
-## Complete VPN!
 
-## Converge both firewall templates into single template by adding more properties
-## SQL SERVER SCHEMA FILE IS ACTING UP -  Is it tho?
-
-## Link content server and disk storage as well O.O
-
-## oh, and add an SQL server <3 may have to configure it with the firewall as well idk
+## add backup disk and VM - check limit on compute resources :(

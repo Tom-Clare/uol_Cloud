@@ -1,8 +1,8 @@
 ## Code has been adapted from: https://github.com/GoogleCloudPlatform/deploymentmanager-samples/blob/master/examples/v2/sqladmin/jinja/sqladmin.jinja
 
-{% set deployment_title = env["deployment"] %}
-{% set instance_title = deployment_title + '-instance' %}
-{% set database_title = deployment_title + '-db' %}
+{% set resource_name = env["name"] %}
+{% set instance_title = resource_name + '-instance' %}
+{% set database_title = resource_name + '-db' %}
 
 resources:
 - name: {{ instance_title }}

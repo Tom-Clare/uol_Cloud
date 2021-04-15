@@ -1,11 +1,11 @@
 info:
   title: firewall template schema
   author: Thomas Clare
-  description: Restrictins for parameters given to the HTTP firewall template
+  description: Restrictins for parameters given to the firewall template
   version: 1.0
 
 imports:
-- path: firewall-http-template.jinja
+- path: firewall-template.jinja
 
 required:
 - network
@@ -16,5 +16,5 @@ properties:
     type: string
     description: the network that the firewall resides on and applies rules to
   IPProtocol: 
-    type: string
+    type: array
     description: Select between TCP or UDP

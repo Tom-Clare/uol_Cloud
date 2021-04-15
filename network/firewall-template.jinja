@@ -1,0 +1,20 @@
+resources:
+- name: {{ env["name"] }}-firewall
+  type: compute.v1.firewall
+  properties:
+    {% if "targetTags" in properties %}
+    targetTags: {{properties["targetTags"]}}
+    {% endif %}
+    network: {{ properties["network"] }}
+    {% if "sourceRanges" in properties %}
+    sourceRanges: {{ properties["sourceRanges"] }}
+    {% else %}
+    sourceRanges: ["0.0.0.0/0"]
+    {% endif %}
+    allowed:
+    {% for protocol in properties["IPProtocol"] %}
+    - IPProtocol: {{ protocol }}
+    {% endfor %}
+    {% if "ports" in properties %}
+      ports: {{ properties["ports"] }}
+    {% endif %}

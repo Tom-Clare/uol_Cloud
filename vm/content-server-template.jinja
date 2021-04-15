@@ -11,6 +11,10 @@ resources:
       autoDelete: true
       initialiseParams:
         sourceImage: projects/debian-cloud/global/images/family/debian-9
+    - deviceName: content-storage
+      type: PERSISTENT
+      source: {{ properties["disk"] }}
+      autoDelete: true
     networkInterfaces:
     - network: global/network/default
     metadata:

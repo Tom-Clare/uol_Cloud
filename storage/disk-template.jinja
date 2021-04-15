@@ -1,5 +1,5 @@
 resources:
-- name: backup-disk
+- name: {{ env["name"] }}-disk
   type: compute.v1.disk
   properties:
     zone: {{ properties ["zone"] }}
